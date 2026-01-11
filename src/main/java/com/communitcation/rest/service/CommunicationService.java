@@ -90,10 +90,9 @@ public class CommunicationService {
 
     // uri 생성
     private String createUri(CommunicationInfo communicationInfo){
-        String uriString;
         RequestFormat format = communicationInfo.getRequestFormat();
         if(format == RequestFormat.QUERY_PARAM){
-            uriString = UriComponentsBuilder
+            return  UriComponentsBuilder
                     .newInstance()
                     .scheme(communicationInfo.getScheme())
                     .host(communicationInfo.getHost())
@@ -101,11 +100,16 @@ public class CommunicationService {
                     .path(communicationInfo.getPath())
                     .queryParams(convertBodyToMultiValueMap(toJson(communicationInfo.getRequestData())))
                     .build()
-                    .encode() // 한글 UTF-8 인코딩 문제 발생하는 경우 주석처리
+                    .encode()
                     .toUriString();
         }
+        else if(format == RequestFormat.PATH) {
+            return communicationInfo.getScheme() + "://"
+                    + communicationInfo.getHost()
+                    + communicationInfo.getPath();
+        }
         else {
-            uriString = UriComponentsBuilder
+            return UriComponentsBuilder
                     .newInstance()
                     .scheme(communicationInfo.getScheme())
                     .host(communicationInfo.getHost())
@@ -115,21 +119,33 @@ public class CommunicationService {
                     .encode()
                     .toUriString();
         }
-        return uriString;
     }
 
     // response 
     private <T> ResponseEntity<?>  getResponse(CommunicationInfo communicationInfo) {
         Method method = communicationInfo.getMethod();
         HttpHeaders headers = createHeaders(communicationInfo); // 헤더 생성
+
         String uri = createUri(communicationInfo); // uri 생성
+
         Class<?> clazz = communicationInfo.getResponseClazz();
+
+        if(clazz == null){
+            clazz = String.class;
+        }
+
         RequestFormat format = communicationInfo.getRequestFormat();
-        Object requestData = (format == RequestFormat.QUERY_PARAM)? null : communicationInfo.getRequestData();
-        ResponseEntity<?> response = byMethod(restClient,method,headers,uri,requestData,clazz);
+
+        Object requestData = (format == RequestFormat.QUERY_PARAM)?
+                        null : communicationInfo.getRequestData();
+
+        ResponseEntity<?> response
+                = byMethod(restClient,method,headers,uri,requestData,clazz);
+
         if (response == null) {
             throw new NullPointerException();
         }
+
         return response;
     }
 

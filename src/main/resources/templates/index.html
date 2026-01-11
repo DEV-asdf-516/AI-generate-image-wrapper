@@ -1,50 +1,307 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>HELLO AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator</title>
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            height: 100vh;
-            margin: 0;
-            padding-top: 1.5vh;
-        }
-        form {
-            margin-bottom: 10px;
-            padding: 20px;
-            width: 600px;
-            display: flex;
-            align-items: center;
-        }
-        input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            margin-right: 10px;
-        }
-        button {
-            padding: 10px 20px;
-        }
-         .dark-mode {
-             background-color: black;
-             color: white;
-         }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-       </style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        color: #eee;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+    }
+
+    .container { width: 100%; max-width: 700px; }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 0.5rem;
+        font-size: 2rem;
+        background: linear-gradient(90deg, #e94560, #ff6b6b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #888;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+    }
+
+    .input-group {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    input[type="text"] {
+        flex: 1;
+        padding: 1rem 1.25rem;
+        border: 2px solid #333;
+        border-radius: 12px;
+        font-size: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        color: #eee;
+        transition: all 0.3s;
+    }
+
+    input[type="text"]:focus {
+        outline: none;
+        border-color: #e94560;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    input[type="text"]::placeholder { color: #666; }
+
+    button {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #e94560, #ff6b6b);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s;
+        min-width: 100px;
+    }
+
+    button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(233, 69, 96, 0.4);
+    }
+
+    button:disabled {
+        background: #444;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .result {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .image-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .image-container img {
+        max-width: 100%;
+        border-radius: 16px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        animation: fadeIn 0.5s ease;
+        display: block;
+    }
+
+    .download-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 0.6rem 1rem;
+        min-width: auto;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 500;
+        opacity: 0;
+        transition: opacity 0.3s, background 0.3s;
+    }
+
+    .image-container:hover .download-btn {
+        opacity: 1;
+    }
+
+    .download-btn:hover:not(:disabled) {
+        background: rgba(233, 69, 96, 0.8);
+        transform: none;
+        box-shadow: none;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .loading { text-align: center; padding: 3rem; }
+
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-top-color: #e94560;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1.5rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text { color: #888; font-size: 1.1rem; }
+
+    .countdown {
+        text-align: center;
+        padding: 2rem;
+        background: rgba(233, 69, 96, 0.1);
+        border-radius: 12px;
+        border: 1px solid rgba(233, 69, 96, 0.3);
+    }
+
+    .countdown-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .countdown-time { font-size: 2rem; font-weight: bold; color: #e94560; }
+    .countdown-text { color: #888; margin-top: 0.5rem; }
+
+    .error {
+        color: #ff6b6b;
+        text-align: center;
+        padding: 1.5rem;
+        background: rgba(255, 107, 107, 0.1);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+
+    </style>
 </head>
-<body class="dark-mode">
-    <h1>AI 이미지 생성기</h1>
-    <form th:action="@{/ai-img}" method="post">
-        <input type="text" id="prompt" name="prompt" placeholder="예: 산책하는 귀여운 웰시코기, 사진같은, 8k 이미지"
-               required>
-        <button type="submit">생성</button>
-    </form>
+<body>
+<div class="container">
+    <h1>🎨 AI Image Generator</h1>
+    <p class="subtitle">Powered by Pollinations.ai</p>
 
-    <div th:if="${session.genImage != null}">
-        <img th:src="@{${session.genImage}}" alt="AI 이미지">
+    <div class="input-group">
+        <input type="text" id="prompt" placeholder="이미지 설명을 입력하세요..." autocomplete="off"/>
+        <button id="generateBtn" onclick="generate()">생성</button>
     </div>
+
+    <div id="status"></div>
+    <div id="result" class="result"></div>
+</div>
+
+<script>
+        let countdownInterval = null;
+        let currentImageData = null;
+
+        async function generate() {
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) return alert('프롬프트를 입력해주세요');
+
+            const btn = document.getElementById('generateBtn');
+            const status = document.getElementById('status');
+            const result = document.getElementById('result');
+
+            btn.disabled = true;
+            btn.textContent = '생성 중...';
+            result.innerHTML = '';
+            status.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">이미지를 생성하고 있습니다...</div>
+                </div>
+            `;
+
+            try {
+               const res = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                const data = await res.json();
+
+                if (res.status === 429) {
+                    startCountdown(data.remainingSeconds);
+                    return;
+                }
+
+                if (!res.ok) {
+                    throw new Error('이미지 생성에 실패했습니다');
+                }
+
+                status.innerHTML = '';
+                currentImageData = data.imageUrl;
+             result.innerHTML = `
+                    <div class="image-container">
+                        <img src="${data.imageUrl}" alt="Generated Image" />
+                        <button class="download-btn" onclick="downloadImage()">Download</button>
+                    </div>
+                `;
+                btn.disabled = false;
+                btn.textContent = '생성';
+
+            } catch (err) {
+                status.innerHTML = `<div class="error">❌ ${err.message}</div>`;
+                btn.disabled = false;
+                btn.textContent = '생성';
+            }
+        }
+
+        function startCountdown(seconds) {
+            const btn = document.getElementById('generateBtn');
+            const status = document.getElementById('status');
+            const result = document.getElementById('result');
+
+            let remaining = seconds;
+            result.innerHTML = '';
+
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            const updateDisplay = () => {
+                status.innerHTML = `
+                    <div class="countdown">
+                        <div class="countdown-icon">⏳</div>
+                        <div class="countdown-time">${remaining}초</div>
+                        <div class="countdown-text">잠시 후 다시 시도해주세요</div>
+                    </div>
+                `;
+                btn.textContent = `${remaining}초`;
+            };
+
+            updateDisplay();
+
+            countdownInterval = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    status.innerHTML = '';
+                    btn.textContent = '생성';
+                    btn.disabled = false;
+                } else {
+                    updateDisplay();
+                }
+            }, 1000);
+        }
+
+        function downloadImage() {
+            if (!currentImageData) return;
+            const link = document.createElement('a');
+            link.href = currentImageData;
+            link.download = `ai-image-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('prompt').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !document.getElementById('generateBtn').disabled) {
+                generate();
+            }
+        });
+
+</script>
 </body>
 </html>
