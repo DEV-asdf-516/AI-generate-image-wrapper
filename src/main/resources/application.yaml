@@ -1,13 +1,25 @@
 spring:
   devtools:
     livereload:
-      enabled: true
-
+      enabled: false
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
-    cache: false
+    cache: true
     check-template-location: true
+  jmx:
+    enabled: false
+  main:
+    lazy-initialization: true
+
+server:
+  port: 8080
+  tomcat:
+    threads:
+      max: 2
+      min-spare: 1
+    max-connections: 50
+    accept-count: 5
 
 pollination:
   publish-key: pk_WQYvjz9SpSpAcJdR
