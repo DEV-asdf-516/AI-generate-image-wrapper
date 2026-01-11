@@ -18,8 +18,8 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          chmod +x ./gradlew 
-         ./gradlew bootJar
+          chmod +x ./gradlew
+          ./gradlew bootJar
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
