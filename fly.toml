@@ -7,7 +7,6 @@ app = 'ai-generate-image-wrapper'
 primary_region = 'ewr'
 
 [build]
-  dockerfile = "Dockerfile"
 
 [http_service]
   internal_port = 8080
