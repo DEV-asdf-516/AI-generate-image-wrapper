@@ -17,7 +17,9 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
-        run: ./gradlew bootJar
+        run: |
+          chmod +x ./gradlew 
+         ./gradlew bootJar
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
