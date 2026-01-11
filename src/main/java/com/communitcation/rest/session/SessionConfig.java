@@ -1,7 +1,5 @@
 package com.communitcation.rest.session;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
