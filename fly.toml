@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for ai-generate-image-wrapper on 2026-01-11T12:33:03Z
+# fly.toml app configuration file generated for ai-generate-image-wrapper on 2026-01-11T13:36:35Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -17,7 +17,7 @@ primary_region = 'ewr'
   processes = ['app']
 
 [[vm]]
-  memory = '512mb'
+  memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
   memory_mb = 512
