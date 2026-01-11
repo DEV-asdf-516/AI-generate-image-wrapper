@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Configuration
 public class SessionConfig {
 
-    public static final long CACHE_TTL = 60_000 * 5;
+    public static final long CACHE_TTL = 60_000 * 3;
     public static final long COOL_DOWN = 15_000;
 
 

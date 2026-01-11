@@ -15,7 +15,7 @@ public class SessionCacheScheduler {
 
     private final Map<String, Map<String, CacheEntry>> sessionCache;
 
-    @Scheduled(fixedRate = 600_000)
+    @Scheduled(fixedRate = 300_000)
     public void cleanExpiredCache() {
         long now = System.currentTimeMillis();
 
@@ -41,7 +41,7 @@ public class SessionCacheScheduler {
         }
 
         if (removedEntries > 0 || removedSessions > 0) {
-            log.debug("Cache cleanup: removed {} entries, {} sessions", removedEntries, removedSessions);
+            log.info("Cache cleanup: removed {} entries, {} sessions", removedEntries, removedSessions);
         }
     }
 

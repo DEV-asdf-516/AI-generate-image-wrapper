@@ -24,7 +24,7 @@ public class SessionCacheListener implements HttpSessionListener {
             return;
         }
 
-        log.debug("Session destroyed, removed {} cached entries for session: {}",
+        log.info("Session destroyed, removed {} cached entries for session: {}",
                 removed.size(),
                 sessionId
         );
