@@ -1,5 +1,5 @@
 app = "Generate AI service wrapper"
-primary_region = "nrt"
+primary_region = "ewr"
 
 [build]
 
@@ -11,6 +11,6 @@ auto_start_machines = true
 min_machines_running = 1
 
 [[vm]]
-memory = "512mb"
+memory = "256mb"
 cpu_kind = "shared"
 cpus = 1
